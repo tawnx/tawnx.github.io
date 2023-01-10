@@ -1,11 +1,12 @@
 ---
-title: test title
-date: 2022-12-17 02:14:38
+title: Upload（文件上传漏洞）
+date: 2022-8-9 17:14:38
 tags: 
-- web
-- 漏洞
+- Web
+- Security
+- Upload
 categories: 
-- web安全基础
+- web安全基础漏洞
 ---
 
 # Upload（文件上传漏洞）
