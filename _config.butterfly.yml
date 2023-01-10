@@ -3,15 +3,15 @@
 # --------------------------------------
 
 menu:
-  # Home: / || fas fa-home
+   Home: / || fas fa-home
    Archives: /archives/ || fas fa-archive
    Tags: /tags/ || fas fa-tags
    Categories: /categories/ || fas fa-folder-open
   # List||fas fa-list:
-  #  Music: /music/ || fas fa-music
-  #  Movie: /movies/ || fas fa-video
+  #   Music: /music/ || fas fa-music
+  #   Movie: /movies/ || fas fa-video
   # Link: /link/ || fas fa-link
-  # About: /about/ || fas fa-heart
+   About: /about/ || fas fa-heart
 
 # Code Blocks (代碼相關)
 # --------------------------------------
@@ -35,8 +35,8 @@ copy:
 # formal:
 #   icon: link || the description
 social:
-   fab fa-github: https://github.com/tawnx || Github
-   # fas fa-envelope: mailto:xxxxxx@gmail.com || Email
+  fab fa-github: https://github.com/tawnx || Github
+  # fas fa-envelope: mailto:xxxxxx@gmail.com || Email
 
 # search (搜索)
 # see https://butterfly.js.org/posts/ceeb73f/#搜索系統
@@ -80,7 +80,7 @@ favicon: /img/favicon.png
 
 # Avatar (頭像)
 avatar:
-  img: https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2021-12/IMG_0225.JPG
+  img: https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png
   effect: false
 
 # Disable all banner image
@@ -153,7 +153,7 @@ post_meta:
 # wordcount (字數統計)
 # see https://butterfly.js.org/posts/ceeb73f/#字數統計
 wordcount:
-  enable: true
+  enable: false
   post_wordcount: true
   min2read: true
   total_wordcount: true
@@ -164,7 +164,7 @@ wordcount:
 # 3: auto_excerpt (default)
 # false: do not show the article introduction
 index_post_content:
-  method: 2
+  method: 3
   length: 500 # if you set method to 2 or 3, the length need to config
 
 # anchor
