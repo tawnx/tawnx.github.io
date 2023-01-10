@@ -795,6 +795,14 @@
   "resolved" "https://registry.npmjs.org/hexo-theme-landscape/-/hexo-theme-landscape-0.0.3.tgz"
   "version" "0.0.3"
 
+"hexo-theme-stellar@^1.18.5":
+  "integrity" "sha512-mi064I+odaBoQq+N5Uw7JqYOHq88kG2UvI7kVO5oyqjkPuI3cvZzNmHxgkJT0HhwxgjlfVwhK3vIRNLazZ2GfQ=="
+  "resolved" "https://registry.npmjs.org/hexo-theme-stellar/-/hexo-theme-stellar-1.18.5.tgz"
+  "version" "1.18.5"
+  dependencies:
+    "hexo-renderer-ejs" "^2.0.0"
+    "hexo-renderer-stylus" "^2.1.0"
+
 "hexo-util@^2.0.0", "hexo-util@^2.7.0":
   "integrity" "sha512-hQM3h34nhDg0bSe/Tg1lnpODvNkz7h2u0+lZGzlKL0Oufp+5KCAEUX9wal7/xC7ax3/cwEn8IuoU75kNpZLpJQ=="
   "resolved" "https://registry.npmjs.org/hexo-util/-/hexo-util-2.7.0.tgz"
